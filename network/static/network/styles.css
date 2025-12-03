@@ -1,0 +1,11 @@
+body {
+  background-color: #f8f9fa; /* Gray background */
+}
+
+#new-post-form textarea {
+  resize: none; /* Prevent thoser ugly resize handles */
+}
+
+.card {
+  border-radius: 8px;
+}

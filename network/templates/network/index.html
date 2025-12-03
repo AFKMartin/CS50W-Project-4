@@ -1,18 +1,24 @@
 {% extends "network/layout.html" %}
-
 {% block body %}
 {% if user.is_authenticated %}
-  <form id="new-post-form" method="POST">
+  <form id="new-post-form" method="POST" class="mb-4">
     {% csrf_token %}
-    <textarea name="content" placeholder="What's happening?" required></textarea>
-    <button type="submit">Post</button>
+    <div class="form-group">
+      <textarea class="form-control" name="content" placeholder="What's happening?" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Post</button>
   </form>
 {% endif %}
+
 {% for post in posts %}
-  <div class="post">
-    <strong>{{ post.author.username }}</strong>
-    <p>{{ post.content }}</p>
-    <small>{{ post.timestamp }}</small>
+  <div class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{ post.author.username }}</h5>
+      <p class="card-text">{{ post.content }}</p>
+      <p class="card-text">
+        <small class="text-muted">{{ post.timestamp|date:"M d, Y H:i" }}</small>
+      </p>
+    </div>
   </div>
 {% endfor %}
 {% endblock %}
