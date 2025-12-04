@@ -1,4 +1,6 @@
 {% extends "network/layout.html" %}
+
+<!-- Index starts here -->
 {% block body %}
 {% if user.is_authenticated %}
   <form id="new-post-form" method="POST" class="mb-4">
@@ -16,7 +18,9 @@
       <h5 class="card-title">{{ post.author.username }}</h5>
       <p class="card-text">{{ post.content }}</p>
       <p class="card-text">
-        <small class="text-muted">{{ post.timestamp|date:"M d, Y H:i" }}</small>
+        <small class="text-muted">
+          {{ post.timestamp|date:"M d, Y H:i" }} | Likes: {{ post.likes.count }}
+        </small>
       </p>
     </div>
   </div>
