@@ -1,0 +1,35 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h3>{{ profile_user.username }}
+        </h3>
+        <p>Followers: {{ followers_count }} | Following: {{ following_count }}</p>
+        
+        {% if user.is_authenticated and user != profile_user %}
+        <form method="POST">
+            {% csrf_token %}
+            {% if is_following %}
+                <button type="submit" class="btn btn-danger">Unfollow</button>
+            {% else %}
+                <button type="submit" class="btn btn-success">Follow</button>
+            {% endif %}
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<h4 class="mt-4">Posts</h4>
+
+{% for post in posts %}
+  <div class="card mb-3">
+    <div class="card-body">
+      <p class="card-text">{{ post.content }}</p>
+      <p class="card-text">
+        <small class="text-muted">{{ post.timestamp|date:"M d, Y H:i" }}</small>
+      </p>
+    </div>
+  </div>
+{% endfor %}
+{% endblock %}

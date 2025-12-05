@@ -13,10 +13,10 @@
 ---
 
 ### Profile Page
-- [ ] Clicking on a username should load that user’s profile page. This page should:
-    - [ ] Display the number of followers the user has, as well as the number of people that the user follows.
-    - [ ] Display all of the posts for that user, in reverse chronological order.
-    - [ ] For any other user who is signed in, this page should also display a “Follow” or “Unfollow” button that will let the current user toggle whether or not they are following this user’s posts. Note that this only applies to any “other” user: a user should not be able to follow themselves.
+- [x] Clicking on a username should load that user’s profile page. This page should:
+    - [x] Display the number of followers the user has, as well as the number of people that the user follows.
+    - [x] Display all of the posts for that user, in reverse chronological order.
+    - [x] For any other user who is signed in, this page should also display a “Follow” or “Unfollow” button that will let the current user toggle whether or not they are following this user’s posts. Note that this only applies to any “other” user: a user should not be able to follow themselves.
 
 ---
 
