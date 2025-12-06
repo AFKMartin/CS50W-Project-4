@@ -1,0 +1,25 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+<h3>Following</h3>
+
+{% if posts %}
+  {% for post in posts %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">
+          <a href="{% url 'profile' post.author.username %}">{{ post.author.username }}</a>
+        </h5>
+        <p class="card-text">{{ post.content }}</p>
+        <p class="card-text">
+          <small class="text-muted">
+            {{ post.timestamp|date:"M d, Y H:i" }} | Likes: {{ post.likes.count }}
+          </small>
+        </p>
+      </div>
+    </div>
+  {% endfor %}
+{% else %}
+  <p class="text-muted">Looks like people you follow haven’t posted anything yet.</p>
+{% endif %}
+{% endblock %}
