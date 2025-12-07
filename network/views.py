@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from .models import User, Post
-
+from django.core.paginator import Paginator
 
 def index(request):
     if request.method == "POST":
@@ -14,8 +14,12 @@ def index(request):
             if content:
                 Post.objects.create(author=request.user, content=content)
                 return redirect("index")
+    
+    posts_list = Post.objects.all().order_by("-timestamp")
+    paginator = Paginator(posts_list, 10) # 10 posts per page
+    page_number = request.GET.get("page")
+    posts = paginator.get_page(page_number)
 
-    posts = Post.objects.all().order_by("-timestamp")
     return render(request, "network/index.html", {"posts": posts})
 
 def login_view(request):
@@ -37,11 +41,9 @@ def login_view(request):
     else:
         return render(request, "network/login.html")
 
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
-
 
 def register(request):
     if request.method == "POST":
@@ -69,10 +71,13 @@ def register(request):
     else:
         return render(request, "network/register.html")
     
-
 def profile(request, username):
     profile_user = get_object_or_404(User, username=username)
-    posts = Post.objects.filter(author=profile_user).order_by("-timestamp")
+    posts_list = Post.objects.filter(author=profile_user).order_by("-timestamp")
+
+    paginator = Paginator(posts_list, 10) # 10 posts per page
+    page_number = request.GET.get("page")
+    posts = paginator.get_page(page_number)
 
     is_following = False # value at the beggining
     if request.user.is_authenticated and request.user != profile_user:
@@ -102,5 +107,10 @@ def following(request):
     following_users = request.user.following.all()
 
     # Posts by those users
-    posts = Post.objects.filter(author__in=following_users).order_by("-timestamp")
+    posts_list = Post.objects.filter(author__in=following_users).order_by("-timestamp")
+
+    paginator = Paginator(posts_list, 10) # 10 posts per page
+    page_number = request.GET.get("page")
+    posts = paginator.get_page(page_number)
+
     return render(request, "network/following.html", {"posts": posts})

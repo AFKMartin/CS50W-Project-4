@@ -22,4 +22,17 @@
 {% else %}
   <p class="text-muted">Looks like people you follow haven’t posted anything yet.</p>
 {% endif %}
+
+<!-- Pagination controls -->
+<div class="pagination">
+  {% if posts.has_previous %}
+    <a class="btn btn-outline-primary" href="?page={{ posts.previous_page_number }}">Previous</a>
+  {% endif %}
+  
+  <span class="mx-2">Page {{ posts.number }} of {{ posts.paginator.num_pages }}</span>
+
+  {% if posts.has_next %}
+    <a class="btn btn-outline-primary" href="?page={{ posts.next_page_number }}">Next</a>
+  {% endif %}
+</div>
 {% endblock %}
