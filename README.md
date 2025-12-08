@@ -34,10 +34,10 @@
 ---
 
 ### Edit Post
-- [ ] Users should be able to click an “Edit” button or link on any of their own posts to edit that post.
-    - [ ] When a user clicks “Edit” for one of their own posts, the content of their post should be replaced with a textarea where the user can edit the content of their post.
-    - [ ] The user should then be able to “Save” the edited post. Using JavaScript, you should be able to achieve this without requiring a reload of the entire page.
-    - [ ] For security, ensure that your application is designed such that it is not possible for a user, via any route, to edit another user’s posts.
+- [x] Users should be able to click an “Edit” button or link on any of their own posts to edit that post.
+    - [x] When a user clicks “Edit” for one of their own posts, the content of their post should be replaced with a textarea where the user can edit the content of their post.
+    - [x] The user should then be able to “Save” the edited post. Using JavaScript, you should be able to achieve this without requiring a reload of the entire page.
+    - [x] For security, ensure that your application is designed such that it is not possible for a user, via any route, to edit another user’s posts.
 
 ---
 

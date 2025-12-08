@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -114,3 +114,26 @@ def following(request):
     posts = paginator.get_page(page_number)
 
     return render(request, "network/following.html", {"posts": posts})
+
+def edit_post(request, post_id):
+    if request.method == "POST":
+        post = get_object_or_404(Post, id=post_id)
+
+        # Only the author should be allowed to edit
+        if post.author != request.user:
+            return JsonResponse({"error": "You cannot edit this post."}, status=403)
+
+        new_content = request.POST.get("content")
+        if new_content:
+            post.content = new_content
+            post.edited = True   # mark as edited
+            post.save()
+            return JsonResponse({
+                "message": "Post updated successfully.",
+                "content": post.content,
+                "edited": post.edited
+            })
+        
+        return JsonResponse({"error": "No content provided."}, status=400)
+
+    return JsonResponse({"error": "Invalid request method."}, status=405)

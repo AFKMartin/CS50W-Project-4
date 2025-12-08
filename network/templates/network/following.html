@@ -10,12 +10,23 @@
         <h5 class="card-title">
           <a href="{% url 'profile' post.author.username %}">{{ post.author.username }}</a>
         </h5>
-        <p class="card-text">{{ post.content }}</p>
+        <!-- Added unique class post-content -->
+        <p class="card-text post-content">
+          {{ post.content }}
+          {% if post.edited %}
+          <small class="text-muted">(edited)</small>
+          {% endif %}
+        </p>
         <p class="card-text">
           <small class="text-muted">
             {{ post.timestamp|date:"M d, Y H:i" }} | Likes: {{ post.likes.count }}
           </small>
         </p>
+
+        <!-- Edit Button -->
+        {% if user == post.author %}
+          <button class="btn btn-sm btn-outline-secondary edit-btn" data-post-id="{{ post.id }}">Edit</button>
+        {% endif %}
       </div>
     </div>
   {% endfor %}
@@ -35,4 +46,50 @@
     <a class="btn btn-outline-primary" href="?page={{ posts.next_page_number }}">Next</a>
   {% endif %}
 </div>
+
+<!-- Script that enables editing your own posts with textarea + AJAX save -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".edit-btn").forEach(button => {
+    button.onclick = () => {
+      const postId = button.dataset.postId;
+      const postCard = button.closest(".card-body");
+      // only selects the post content, not timestamp/likes
+      const contentPara = postCard.querySelector(".post-content");
+
+      const textarea = document.createElement("textarea");
+      textarea.className = "form-control mb-2";
+      textarea.value = contentPara.innerText;
+      postCard.replaceChild(textarea, contentPara);
+
+      const saveBtn = document.createElement("button");
+      saveBtn.className = "btn btn-sm btn-primary";
+      saveBtn.innerText = "Save";
+      postCard.appendChild(saveBtn);
+
+      saveBtn.onclick = () => {
+        fetch(`/edit_post/${postId}`, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+          },
+          body: new URLSearchParams({ "content": textarea.value })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.content) {
+            const newPara = document.createElement("p");
+            newPara.className = "card-text post-content";
+            newPara.innerText = data.content;
+            postCard.replaceChild(newPara, textarea);
+            saveBtn.remove();
+          } else {
+            alert(data.error);
+          }
+        });
+      };
+    };
+  });
+});
+</script>
 {% endblock %}
