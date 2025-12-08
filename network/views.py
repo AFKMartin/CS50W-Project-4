@@ -115,6 +115,7 @@ def following(request):
 
     return render(request, "network/following.html", {"posts": posts})
 
+@login_required
 def edit_post(request, post_id):
     if request.method == "POST":
         post = get_object_or_404(Post, id=post_id)
