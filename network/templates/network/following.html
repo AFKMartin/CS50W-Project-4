@@ -2,7 +2,8 @@
 
 {% block body %}
 <h3>Following</h3>
-
+<!-- Hidden CSRF token -->
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 {% if posts %}
   {% for post in posts %}
     <div class="card mb-3">
@@ -10,18 +11,27 @@
         <h5 class="card-title">
           <a href="{% url 'profile' post.author.username %}">{{ post.author.username }}</a>
         </h5>
-        <!-- Added unique class post-content -->
-        <p class="card-text post-content">
-          {{ post.content }}
+        <p class="card-text">
+          <span class="post-content">{{ post.content }}</span>
           {% if post.edited %}
-          <small class="text-muted">(edited)</small>
+            <small class="text-muted">(edited)</small>
           {% endif %}
         </p>
         <p class="card-text">
           <small class="text-muted">
-            {{ post.timestamp|date:"M d, Y H:i" }} | Likes: {{ post.likes.count }}
+            {{ post.timestamp|date:"M d, Y H:i" }} | 
+            Likes: <span class="like-count">{{ post.likes.count }}</span>
           </small>
         </p>
+
+        <!-- Like Button -->
+        <button class="btn btn-sm btn-outline-primary like-btn" data-post-id="{{ post.id }}">
+          {% if user in post.likes.all %}
+            👎
+          {% else %}
+            👍
+          {% endif %}
+        </button>
 
         <!-- Edit Button -->
         {% if user == post.author %}
@@ -55,12 +65,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const postId = button.dataset.postId;
       const postCard = button.closest(".card-body");
       // only selects the post content, not timestamp/likes
-      const contentPara = postCard.querySelector(".post-content");
+      const contentSpan = postCard.querySelector(".post-content");
 
       const textarea = document.createElement("textarea");
       textarea.className = "form-control mb-2";
-      textarea.value = contentPara.innerText;
-      postCard.replaceChild(textarea, contentPara);
+      textarea.value = contentSpan.innerText;
+      contentSpan.replaceWith(textarea);
 
       const saveBtn = document.createElement("button");
       saveBtn.className = "btn btn-sm btn-primary";
@@ -78,16 +88,55 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
           if (data.content) {
-            const newPara = document.createElement("p");
-            newPara.className = "card-text post-content";
-            newPara.innerText = data.content;
-            postCard.replaceChild(newPara, textarea);
+            const newSpan = document.createElement("span");
+            newSpan.className = "post-content";
+            newSpan.innerText = data.content;
+
+            const parentP = textarea.closest("p");
+            const editedTag = parentP.querySelector("small.text-muted");
+            if (editedTag) {
+              parentP.insertBefore(newSpan, editedTag);
+            } else {
+              parentP.appendChild(newSpan);
+            }
+
+            textarea.remove();
             saveBtn.remove();
           } else {
             alert(data.error);
           }
         });
       };
+    };
+  });
+});
+</script>
+
+<!-- Like/Unlike button Script -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Like/Unlike functionality
+  document.querySelectorAll(".like-btn").forEach(button => {
+    button.onclick = () => {
+      const postId = button.dataset.postId;
+      const postCard = button.closest(".card-body");
+      const likeCountSpan = postCard.querySelector(".like-count");
+
+      fetch(`/toggle_like/${postId}`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.likes_count !== undefined) {
+          likeCountSpan.innerText = data.likes_count;
+          button.innerText = data.liked ? "👎" : "👍";
+        } else {
+          alert(data.error);
+        }
+      });
     };
   });
 });

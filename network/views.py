@@ -138,3 +138,23 @@ def edit_post(request, post_id):
         return JsonResponse({"error": "No content provided."}, status=400)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
+
+@login_required
+def toggle_like(request, post_id):
+    if request.method == "POST":
+        post = get_object_or_404(Post, id=post_id)
+        user = request.user
+
+        if user in post.likes.all():
+            post.likes.remove(user)
+            liked = False
+        else:
+            post.likes.add(user)
+            liked = True
+
+        return JsonResponse({
+            "liked": liked,
+            "likes_count": post.likes.count()
+        })
+
+    return JsonResponse({"error": "Invalid request method."}, status=405) # Just in case
